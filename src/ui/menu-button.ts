@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 
-const padding = 10;
+const padding = 0;
 const minimumWidth = 200;
 const minimumHeight = 50;
 
@@ -13,7 +13,7 @@ export class MenuButton extends Phaser.GameObjects.Rectangle {
     this.setOrigin(0, 0);
 
     this.label = scene.add
-      .text(x + padding, y + padding, text)
+      .text(x + padding + 45, y + padding + 15, text)
       .setFontSize(18)
       .setAlign('center');
 
@@ -26,7 +26,6 @@ export class MenuButton extends Phaser.GameObjects.Rectangle {
     this.setInteractive({ useHandCursor: true })
       .on('pointerover', this.enterMenuButtonHoverState)
       .on('pointerout', this.enterMenuButtonRestState)
-      .on('pointerdown', this.enterMenuButtonActiveState)
       .on('pointerup', this.enterMenuButtonHoverState);
 
     if (onClick) {
@@ -37,17 +36,12 @@ export class MenuButton extends Phaser.GameObjects.Rectangle {
   }
 
   private enterMenuButtonHoverState() {
-    this.label.setColor('#000000');
-    this.setFillStyle(0x888888);
+    this.label.setColor('#FF0000');
+    this.setFillStyle(0x3427d2);
   }
 
   private enterMenuButtonRestState() {
     this.label.setColor('#FFFFFF');
-    this.setFillStyle(0x888888);
-  }
-
-  private enterMenuButtonActiveState() {
-    this.label.setColor('#BBBBBB');
-    this.setFillStyle(0x444444);
+    this.setFillStyle(0xff0000);
   }
 }

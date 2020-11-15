@@ -74,5 +74,12 @@ export class BootScene extends Phaser.Scene {
 
     // Source: Open Game Art
     this.load.image('man', 'assets/sprites/character.png');
+    this.load.image('circle', 'assets/sprites/circle.png');
+    this.load.image('node', 'assets/sprites/Sans Skull.png');
+    this.load.spritesheet('node-sprites', 'assets/sprites/node-sprites.png', { frameWidth: 50, frameHeight: 50 });
+
+    this.load.audio('move', ['assets/move.wav']);
+    this.load.audio('wrong', ['assets/wrong.wav']);
+    this.load.audio('correct', ['assets/correct.wav']);
   }
 }
