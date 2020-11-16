@@ -147,6 +147,9 @@ export class GameScene extends Phaser.Scene {
 
   setupInputHandlers(): void {
     this.input.keyboard.on('keydown_W', () => {
+      if (!this.playerPointer.parent) {
+        return;
+      }
       this.setChildLineColor(false);
       this.playerPointer.deactivateParentMode();
       this.playerPointer = this.playerPointer.parent;
@@ -169,6 +172,10 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.input.keyboard.on('keydown_S', () => {
+      if (this.childChoices.length == 0) {
+        return;
+      }
+
       this.setChildLineColor(false);
       this.playerPointer.deactivateParentMode();
       this.playerPointer = this.childChoices[this.playerPointerChildIndex];
@@ -188,6 +195,11 @@ export class GameScene extends Phaser.Scene {
       }
       this.setChildLineColor(true);
       this.move.play();
+    });
+
+    this.input.keyboard.on('keydown_Zz', () => {
+      this.cameras.main.zoom -= 0.1;
+      console.log(this.cameras.main.zoom);
     });
 
     this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
@@ -280,13 +292,6 @@ export class GameScene extends Phaser.Scene {
     'aruber',
     'arubicon',
     'arubicundus',
-    'aromane',
-    'aromanus',
-    'aromulus',
-    'arubens',
-    'aruber',
-    'arubicon',
-    'arubicundus',
     'bromane',
     'bromanus',
     'bromulus',
@@ -300,12 +305,6 @@ export class GameScene extends Phaser.Scene {
     'baruber',
     'barubicon',
     'barubicundus',
-    'caromanus',
-    'caromulus',
-    'carubens',
-    'caruber',
-    'carubicon',
-    'carubicundus',
     'caromane',
     'caromanus',
     'caromulus',

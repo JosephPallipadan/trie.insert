@@ -21,6 +21,12 @@ export class MainMenuScene extends Phaser.Scene {
       })
       .setFontSize(48);
 
+    this.add
+      .text(560, 350, 'W A S D - Movement | Shift - Add Node', {
+        fill: '#FF0000',
+      })
+      .setFontSize(36);
+
     new MenuButton(this, window.innerWidth / 2 - 100, window.innerHeight / 2, 'Start Game', () => {
       this.scene.start('Game');
     });
