@@ -3,6 +3,7 @@ import { getGameWidth, getGameHeight } from '../helpers';
 import TrieNode from '../TrieNode';
 
 const Vector2 = Phaser.Math.Vector2;
+const InTestMode = true;
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -197,9 +198,15 @@ export class GameScene extends Phaser.Scene {
       this.move.play();
     });
 
-    this.input.keyboard.on('keydown_Zz', () => {
+    this.input.keyboard.on('keydown_Z', () => {
       this.cameras.main.zoom -= 0.1;
-      console.log(this.cameras.main.zoom);
+    });
+
+    this.input.keyboard.on('keydown_H', () => {
+      this.highScoreText.visible = !this.scoreText.visible;
+      this.currentLetter.visible = !this.scoreText.visible;
+      this.currentWord.visible = !this.scoreText.visible;
+      this.scoreText.visible = !this.scoreText.visible;
     });
 
     this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
@@ -213,13 +220,15 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.zoom = 1;
     let char = this.words[this.wordIndex][this.index];
 
+    // Traverse trie till insertion point reached
     while (this.index < this.words[this.wordIndex].length && this.runner.children.hasOwnProperty(char)) {
       this.runner = this.runner.children[char];
       char = this.words[this.wordIndex][++this.index];
     }
 
+    // Make sure an insertion point was actually reached (didn't just reach the end of the word)
     if (this.index < this.words[this.wordIndex].length) {
-      if (this.runner == this.playerPointer) {
+      if (this.runner == this.playerPointer || InTestMode) {
         this.runner = this.runner.addChild(char, this);
         this.index++;
         this.correct.play();
@@ -259,6 +268,9 @@ export class GameScene extends Phaser.Scene {
     this.setupHud();
     this.setupInputHandlers();
     this.lastAddTime = Date.now();
+    // setInterval(() => {
+    //   if (this.wordIndex < this.words.length) this.addNextLetter();
+    // }, 1000);
   }
 
   public update(): void {
@@ -267,7 +279,7 @@ export class GameScene extends Phaser.Scene {
     const currPos = new Phaser.Math.Vector2(camera.scrollX, camera.scrollY);
     const destination = new Vector2(
       this.playerPointer.gameObject.x - getGameWidth(this) / 2,
-      this.playerPointer.gameObject.y - 600,
+      this.playerPointer.gameObject.y - getGameHeight(this) / 2,
     );
     const newPosition = currPos.lerp(destination, 0.05);
     if (newPosition.fuzzyEquals(destination, 0.001)) {
@@ -277,40 +289,89 @@ export class GameScene extends Phaser.Scene {
   }
 
   words: string[] = [
-    'romane',
-    'romanus',
-    'romulus',
-    'rubens',
-    'aromane',
-    'baromane',
-    'ruber',
-    'rubicon',
-    'rubicundus',
-    'aromanus',
-    'aromulus',
-    'arubens',
-    'aruber',
-    'arubicon',
-    'arubicundus',
-    'bromane',
+    'ceromanus',
     'bromanus',
-    'bromulus',
-    'brubens',
-    'bruber',
-    'brubicon',
-    'brubicundus',
-    'baromanus',
-    'baromulus',
-    'barubens',
-    'baruber',
-    'barubicon',
-    'barubicundus',
-    'caromane',
+    'rubicon',
+    'ceromane',
+    'borubicon',
+    'cromulus',
+    'berubicundus',
+    'coromane',
+    'cerubicundus',
     'caromanus',
+    'crubens',
+    'arubicon',
+    'baromulus',
+    'crubicundus',
+    'berubicon',
+    'aromanus',
+    'orubens',
+    'corubicundus',
+    'barubicon',
+    'arubens',
+    'eromulus',
+    'coruber',
+    'orubicon',
+    'corubicon',
+    'romulus',
+    'orubicundus',
+    'aromulus',
+    'cromane',
+    'barubicundus',
     'caromulus',
-    'carubens',
-    'caruber',
-    'carubicon',
+    'oromane',
+    'cerubens',
+    'aruber',
+    'rubens',
+    'bromulus',
+    'caromane',
+    'baromane',
+    'oromanus',
+    'erubicundus',
+    'eromanus',
+    'aromane',
     'carubicundus',
+    'eruber',
+    'bromane',
+    'crubicon',
+    'rubicundus',
+    'coromanus',
+    'caruber',
+    'baromanus',
+    'oromulus',
+    'beromanus',
+    'beromane',
+    'coromulus',
+    'ceromulus',
+    'brubicundus',
+    'cromanus',
+    'eromane',
+    'erubens',
+    'borubens',
+    'erubicon',
+    'arubicundus',
+    'borubicundus',
+    'boromane',
+    'carubicon',
+    'corubens',
+    'bruber',
+    'ruber',
+    'romane',
+    'boruber',
+    'baruber',
+    'beruber',
+    'beromulus',
+    'berubens',
+    'boromanus',
+    'brubens',
+    'cerubicon',
+    'barubens',
+    'boromulus',
+    'cruber',
+    'oruber',
+    'brubicon',
+    'ceruber',
+    'carubens',
+    'romanus',
   ];
 }

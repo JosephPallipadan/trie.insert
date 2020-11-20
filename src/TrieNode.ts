@@ -2,6 +2,13 @@ const Vector2 = Phaser.Math.Vector2;
 const HorizontalDistance = 75;
 const VerticalDistance = 100;
 
+const XTopAdjustment = 0;
+const YTopAdjustment = 0;
+const LevelSeparation = 100;
+const MaxDepth = Infinity;
+const SiblingSeparation = 75;
+const SubtreeSeparation = 100;
+
 export default class TrieNode {
   val: string;
   children: Record<string, TrieNode>;
@@ -94,7 +101,7 @@ export default class TrieNode {
             if (node.gameObject.x < runner.gameObject.x - 10) {
               TrieNode.translateAlongWithDescendants(node, -HorizontalDistance * lastAddTranslationFactor);
             } else if (node.gameObject.x > runner.gameObject.x + 10) {
-              TrieNode.translateAlongWithDescendants(node, HorizontalDistance);
+              TrieNode.translateAlongWithDescendants(node, HorizontalDistance * lastAddTranslationFactor);
             }
           });
         }
