@@ -1,25 +1,31 @@
+import ECOTree from './ECOTree.js';
+
 const Vector2 = Phaser.Math.Vector2;
-const HorizontalDistance = 75;
-const VerticalDistance = 100;
 
-const XTopAdjustment = 0;
-const YTopAdjustment = 0;
-const LevelSeparation = 100;
-const MaxDepth = Infinity;
-const SiblingSeparation = 75;
-const SubtreeSeparation = 100;
+let idTracker = 1;
 
-export default class TrieNode {
+const actualTree = new ECOTree('myTree', 'bla');
+actualTree.add(0, -1, 'Apex Node');
+
+interface ECONode {
+  XPosition: number;
+  YPosition: number;
+}
+
+export class TrieNode {
   val: string;
   children: Record<string, TrieNode>;
-  childCount: number;
-  lastAddedChild: TrieNode;
+  root: TrieNode;
+  parent: TrieNode;
+
+  id: number;
+  actual: ECONode;
+
+  text: Phaser.GameObjects.Text;
   lines: Record<string, Phaser.GameObjects.Line>; // Line from this object to child corresponding to letter
   gameObject: Phaser.GameObjects.Sprite;
   moveTo: Phaser.Math.Vector2;
-  root: TrieNode;
-  parent: TrieNode;
-  text: Phaser.GameObjects.Text;
+
   scaler = 1;
   scaleDirection = 1;
 
@@ -29,10 +35,12 @@ export default class TrieNode {
     this.children = {};
     this.lines = {};
     this.moveTo = new Vector2(gameObject.x, gameObject.y);
-    this.childCount = 0;
-    this.lastAddedChild = null;
     this.parent = parent;
-    this.root = val == '' ? this : parent.root;
+    this.id = idTracker++;
+    this.root = val == '0' || val == '' ? this : parent.root;
+
+    this.actual = actualTree.add(this.id, parent?.id || 0);
+    actualTree._positionTree();
 
     gameObject.setDepth(1);
     gameObject.play('idle-start').once('animationcomplete', () => {
@@ -40,75 +48,22 @@ export default class TrieNode {
     });
   }
 
-  // Translate node and every single descendant of node horizontally by xOffset using a bfs.
-  static translateAlongWithDescendants(node: TrieNode, xOffset: number): void {
-    const nodes = [node];
-    while (nodes.length > 0) {
-      const child = nodes.pop();
-      child.moveTo.x += xOffset;
-      nodes.push(...Object.values(child.children));
-    }
-  }
+  setMoveTo(): void {
+    this.moveTo.x = this.actual.XPosition;
+    this.moveTo.y = this.actual.YPosition;
 
-  // Get the left most or right most node in the subtree rooted at this node.
-  static getOutermostNode(node: TrieNode, searchLeftWards: boolean): TrieNode {
-    const children = Object.values(node.children);
-    if (children.length == 0) {
-      return node;
-    }
-    let farthest = children[0];
-    children.forEach((child) => {
-      const factor = searchLeftWards ? -1 : 1;
-      farthest = child.gameObject.x * factor > farthest.gameObject.x * factor ? child : farthest;
+    Object.values(this.children).forEach((child) => {
+      child.setMoveTo();
     });
-    return TrieNode.getOutermostNode(farthest, searchLeftWards);
   }
 
   addChild(val: string, scene: Phaser.Scene): TrieNode {
-    const child = new TrieNode(
-      val,
-      scene.add.sprite(this.gameObject.x, this.gameObject.y + VerticalDistance, 'node'),
-      this,
-    );
+    const child = new TrieNode(val, scene.add.sprite(this.gameObject.x, this.gameObject.y, 'node'), this);
     child.text = scene.add.text(child.gameObject.x - 3, child.gameObject.y - 7, val, {
       fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, sans serif',
     });
     child.text.setDepth(2);
     this.children[child.val] = child;
-    this.childCount++;
-
-    // If this child was even numbered, horizontal shifting needs to happen.
-    if (this.childCount % 2 == 0) {
-      // At this point, both the last added child and the newly added will be occupying the same spots.
-      // This makes it so that they will not violate the conditions for translation in the forthcoming loop
-      // while at the same time will move to their correct positions eventually.
-
-      const lastAddTranslationFactor =
-        Math.abs(
-          this.lastAddedChild.gameObject.x - TrieNode.getOutermostNode(this.lastAddedChild, false).gameObject.x,
-        ) /
-          HorizontalDistance +
-        1;
-
-      child.moveTo.x += HorizontalDistance;
-      TrieNode.translateAlongWithDescendants(this.lastAddedChild, -HorizontalDistance * lastAddTranslationFactor);
-
-      let runner = child;
-      while (runner.val != '') {
-        const siblings = Object.values(runner.parent.children);
-        if (siblings.length > 1) {
-          siblings.forEach((node) => {
-            if (node.gameObject.x < runner.gameObject.x - 10) {
-              TrieNode.translateAlongWithDescendants(node, -HorizontalDistance * lastAddTranslationFactor);
-            } else if (node.gameObject.x > runner.gameObject.x + 10) {
-              TrieNode.translateAlongWithDescendants(node, HorizontalDistance * lastAddTranslationFactor);
-            }
-          });
-        }
-        runner = runner.parent;
-      }
-    }
-    this.lastAddedChild = child;
 
     const x1 = this.gameObject.x;
     const y1 = this.gameObject.y;
@@ -116,13 +71,13 @@ export default class TrieNode {
     const y2 = child.gameObject.y;
     this.lines[child.val] = scene.add.line(0, 0, x1, y1, x2, y2, 0xff0000).setOrigin(0, 0);
 
-    // child.gameObject.setDepth(1);
+    this.root.setMoveTo();
+
     return child;
   }
 
   update(): void {
-    // this.gameObject.angle += 1;w
-    // this.scaler += 0.002 * this.scaleDirection;
+    this.scaler += 0.002 * this.scaleDirection;
     this.gameObject.scale = this.scaler;
     if (this.scaler >= 1.1) {
       this.scaleDirection = -1;

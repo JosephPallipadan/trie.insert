@@ -1,0 +1,35 @@
+import { Input } from 'phaser';
+import { TrieNode } from '../TrieNode';
+export declare class GameScene extends Phaser.Scene {
+    root: TrieNode;
+    reached: boolean;
+    wordIndex: number;
+    index: number;
+    runner: TrieNode;
+    playerPointer: TrieNode;
+    playerPointerChildIndex: number;
+    childChoices: TrieNode[];
+    currentWord: Phaser.GameObjects.Text;
+    currentLetter: Phaser.GameObjects.Text;
+    scoreText: Phaser.GameObjects.Text;
+    highScoreText: Phaser.GameObjects.Text;
+    shiftKey: Input.Keyboard.Key;
+    score: number;
+    highScore: number;
+    lastAddTime: number;
+    correct: Phaser.Sound.BaseSound;
+    wrong: Phaser.Sound.BaseSound;
+    move: Phaser.Sound.BaseSound;
+    constructor();
+    setupAudio(): void;
+    setupAnimations(): void;
+    doTrieInitTasks(): void;
+    setupHud(): void;
+    setChildLineColor(isParent: boolean): void;
+    setChildChoices(): void;
+    setupInputHandlers(): void;
+    addNextLetter(): void;
+    create(): void;
+    update(): void;
+    words: string[];
+}

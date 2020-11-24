@@ -27,8 +27,31 @@ export class MainMenuScene extends Phaser.Scene {
       })
       .setFontSize(36);
 
+    this.add
+      .text(400, 600, 'Press C To Input Custom Words | Press X To Clear Custom Inputs', {
+        fill: '#FF0000',
+      })
+      .setFontSize(30);
+
     new MenuButton(this, window.innerWidth / 2 - 100, window.innerHeight / 2, 'Start Game', () => {
       this.scene.start('Game');
+    });
+
+    this.input.keyboard.on('keydown_C', () => {
+      const words = prompt('Enter a comma separated list of words');
+      localStorage.setItem('words', words);
+    });
+
+    this.input.keyboard.on('keydown_X', () => {
+      localStorage.removeItem('words');
+    });
+
+    this.input.keyboard.on('keydown_T', () => {
+      localStorage.setItem('Test Mode', 'true');
+    });
+
+    this.input.keyboard.on('keydown_Y', () => {
+      localStorage.removeItem('Test Mode');
     });
   }
 }

@@ -1,9 +1,9 @@
 import { Input } from 'phaser';
 import { getGameWidth, getGameHeight } from '../helpers';
-import TrieNode from '../TrieNode';
+import { TrieNode } from '../TrieNode';
 
 const Vector2 = Phaser.Math.Vector2;
-const InTestMode = true;
+let InTestMode = true;
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -92,7 +92,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   doTrieInitTasks(): void {
-    this.root = new TrieNode('', this.add.sprite(getGameWidth(this) / 2, getGameHeight(this) / 6, 'node'));
+    this.root = new TrieNode('0', this.add.sprite(getGameWidth(this) / 2, getGameHeight(this) / 6, 'node'));
     this.root.gameObject.play('sans').once('animationcomplete', () => {
       this.root.gameObject.play('eyes');
     });
@@ -101,9 +101,14 @@ export class GameScene extends Phaser.Scene {
     });
     this.runner = this.root;
     this.playerPointer = this.root;
+    InTestMode = !!localStorage.getItem('Test Mode');
   }
 
   setupHud(): void {
+    if (localStorage.getItem('words')) {
+      this.words = localStorage.getItem('words').split(',');
+    }
+
     this.currentWord = this.add.text(1650, 30, `Current Word: ${this.words[0]}`, {
       fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
     });
@@ -124,12 +129,15 @@ export class GameScene extends Phaser.Scene {
     this.currentLetter.setScrollFactor(0);
     this.scoreText.setScrollFactor(0);
     this.highScoreText.setScrollFactor(0);
+
+    this.currentLetter.setDepth(2);
+    this.currentWord.setDepth(2);
+    this.scoreText.setDepth(2);
+    this.highScoreText.setDepth(2);
   }
 
   setChildLineColor(isParent: boolean): void {
     if (this.childChoices.length > 0) {
-      console.log({ choices: this.childChoices, index: this.playerPointerChildIndex });
-
       this.playerPointer.lines[this.childChoices[this.playerPointerChildIndex].val].strokeColor = isParent
         ? 0x00ff00
         : 0xff0000;
@@ -202,6 +210,10 @@ export class GameScene extends Phaser.Scene {
       this.cameras.main.zoom -= 0.1;
     });
 
+    this.input.keyboard.on('keydown_X', () => {
+      this.cameras.main.zoom += 0.1;
+    });
+
     this.input.keyboard.on('keydown_H', () => {
       this.highScoreText.visible = !this.scoreText.visible;
       this.currentLetter.visible = !this.scoreText.visible;
@@ -217,7 +229,6 @@ export class GameScene extends Phaser.Scene {
 
   addNextLetter(): void {
     this.reached = false;
-    this.cameras.main.zoom = 1;
     let char = this.words[this.wordIndex][this.index];
 
     // Traverse trie till insertion point reached
