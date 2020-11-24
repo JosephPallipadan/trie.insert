@@ -2,6 +2,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   entry: {
@@ -30,7 +31,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
 
-  mode: 'production',
+  mode: 'development',
 
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
@@ -53,6 +54,7 @@ module.exports = {
       'typeof CANVAS_RENDERER': JSON.stringify(true),
       'typeof WEBGL_RENDERER': JSON.stringify(true),
     }),
+    // new BundleAnalyzerPlugin(),
   ],
 
   optimization: {
