@@ -19,7 +19,7 @@ module.exports = {
     ],
   },
 
-  devtool: 'inline-source-map',
+  // devtool: 'inline-source-map',
 
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -30,7 +30,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
 
-  mode: 'development',
+  mode: 'production',
 
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
